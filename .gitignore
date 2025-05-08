@@ -24,4 +24,4 @@ pnpm-debug.log*
 *.sublime-project
 
 # misc
-*.local
+*.localcle
