@@ -251,7 +251,7 @@ function Navigation({ onContactClick }: { onContactClick: () => void }) {
               onClick={() => setIsMenuOpen(false)}
               className="block px-3 py-2 rounded-md text-base font-medium text-nexius-charcoal hover:text-nexius-navy hover:bg-gray-50"
             >
-              Testimonials
+              Our Testimonials
             </a>
             <button 
               onClick={() => {
