@@ -37,6 +37,8 @@ import { EventDetail } from './pages/EventDetail';
 import { Blog } from './pages/Blog';
 import { BlogPost } from './pages/BlogPost';
 import { LinksPage } from './pages/LinksPage';
+import { AIIgnite } from './pages/AIIgnite';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Events } from './pages/Events';
 import { NotFound } from './pages/NotFound';
 import { Chat } from './components/Chat';
@@ -198,7 +200,7 @@ function Navigation({ onContactClick }: { onContactClick: () => void }) {
             <Link to="/blog" className="font-body font-medium text-nexius-charcoal hover:text-nexius-navy transition-colors">Blog</Link>
             <Link to="/case-studies" className="font-body font-medium text-nexius-charcoal hover:text-nexius-navy transition-colors">Case Studies</Link>
             <Link to="/events" className="font-body font-medium text-nexius-charcoal hover:text-nexius-navy transition-colors">Events</Link>
-            <a href="/#testimonials" className="font-body font-medium text-nexius-charcoal hover:text-nexius-navy transition-colors">Testimonials</a>
+            <Link to="/ai-ignite" className="font-body font-medium text-nexius-charcoal hover:text-nexius-navy transition-colors">AI-Ignite</Link>
             <button 
               onClick={onContactClick}
               data-contact="true"
@@ -246,13 +248,13 @@ function Navigation({ onContactClick }: { onContactClick: () => void }) {
             >
               Events
             </Link>
-            <a 
-              href="/#testimonials" 
+            <Link 
+              to="/ai-ignite"
               onClick={() => setIsMenuOpen(false)}
               className="block px-3 py-2 rounded-md text-base font-medium text-nexius-charcoal hover:text-nexius-navy hover:bg-gray-50"
             >
-              Our Testimonials
-            </a>
+              AI-Ignite
+            </Link>
             <button 
               onClick={() => {
                 setIsMenuOpen(false);
@@ -490,7 +492,7 @@ function HomePage() {
             <div>
               <h3 className="text-white font-semibold mb-4">Legal</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
               </ul>
@@ -543,6 +545,8 @@ export default function App() {
         <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/upload" element={<UploadLogo />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/ai-ignite" element={<AIIgnite />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/event/:slug" element={<EventDetail />} />
         <Route path="/events" element={<Events />} />
         <Route path="/links" element={<LinksPage />} />

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { X, User, Mail, Phone, Link as LinkIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { loadStripe } from '@stripe/stripe-js';
 import type { Event } from '../types/database';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 interface EventRegistrationFormProps {
   event: Event;
@@ -26,8 +29,8 @@ export function EventRegistrationForm({ event, isOpen, onClose }: EventRegistrat
     try {
       setLoading(true);
 
-      // Insert into event_registrations table
-      const { error } = await supabase
+      // Create registration record first
+      const { data, error } = await supabase
         .from('event_registrations')
         .insert([
           {
@@ -40,9 +43,58 @@ export function EventRegistrationForm({ event, isOpen, onClose }: EventRegistrat
             linkedin_url: formData.linkedIn,
             status: 'pending'
           }
-        ]);
+        ])
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw new Error('Failed to create registration. Please try again.');
+      }
+      
+      if (!data) {
+        throw new Error('Failed to create registration record');
+      }
+      
+      // If event has a ticket price, initiate Stripe payment
+      if (event.ticket_price) {
+        const stripe = await stripePromise;
+        if (!stripe) throw new Error('Stripe failed to load');
+
+        // Create Stripe checkout session
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout`, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({
+            eventId: event.id,
+            registrationId: data.id,
+            ticketPrice: event.ticket_price,
+            customerEmail: formData.email,
+            eventTitle: event.title
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create checkout session');
+        }
+
+        const { sessionId } = await response.json();
+        
+        // Redirect to Stripe Checkout
+        const result = await stripe.redirectToCheckout({
+          sessionId,
+        });
+
+        if (result.error) {
+          throw result.error;
+        }
+
+        return; // Don't close form or show success message yet
+      }
 
       alert('Registration successful! You will receive a confirmation email shortly.');
       onClose();
@@ -65,12 +117,15 @@ export function EventRegistrationForm({ event, isOpen, onClose }: EventRegistrat
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-display font-bold text-nexius-navy">
-              Register for Event
+              {event.ticket_price 
+                ? `Register for Event - $${event.ticket_price}`
+                : 'Register for Event'
+              }
             </h2>
             <button
               onClick={onClose}

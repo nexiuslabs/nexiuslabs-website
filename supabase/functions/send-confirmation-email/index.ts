@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
+import { createTransport } from 'npm:nodemailer@6.9.12';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,16 +14,36 @@ serve(async (req) => {
   try {
     const { to, firstName } = await req.json();
 
-    // Create Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
+    if (!to || !firstName) {
+      throw new Error('Missing required fields');
+    }
 
-    // Send email using Supabase's built-in email service
-    const { error } = await supabaseClient.auth.admin.sendRawEmail({
-      to,
-      subject: 'Thank You for Contacting NEXIUS Labs',
+    // Get SMTP settings from environment variables
+    const smtpHost = Deno.env.get('SMTP_HOST');
+    const smtpPort = parseInt(Deno.env.get('SMTP_PORT') || '465');
+    const smtpUser = Deno.env.get('SMTP_USER');
+    const smtpPass = Deno.env.get('SMTP_PASS');
+
+    if (!smtpHost || !smtpUser || !smtpPass) {
+      throw new Error('SMTP configuration not found in environment variables');
+    }
+
+    // Create SMTP transporter
+    const transporter = createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: true,
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    });
+
+    // Send email
+    await transporter.sendMail({
+      from: `"NEXIUS Labs" <${smtpUser}>`,
+      to: to,
+      subject: "Thank You for Contacting NEXIUS Labs",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #1D2A4D;">Thank You for Reaching Out!</h2>
@@ -53,8 +73,6 @@ serve(async (req) => {
       `,
     });
 
-    if (error) throw error;
-
     return new Response(
       JSON.stringify({ message: 'Email sent successfully' }),
       {
@@ -63,6 +81,7 @@ serve(async (req) => {
       }
     );
   } catch (error) {
+    console.error('Error sending email:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {

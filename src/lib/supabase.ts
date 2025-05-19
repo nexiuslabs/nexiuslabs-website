@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { type AuthError } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+// Ensure we have the required environment variables
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://tunidbyclygzipvbfzee.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Improved error handling
@@ -31,8 +32,8 @@ const retryOperation = async (operation: () => Promise<any>, maxRetries = 3) => 
   }
 };
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+if (!supabaseAnonKey) {
+  throw new Error('Missing Supabase anonymous key');
 }
 
 // Initialize storage with fallback

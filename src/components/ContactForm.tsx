@@ -51,6 +51,11 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.firstName || !formData.email) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -64,10 +69,33 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
             email: formData.email,
             phone: formData.phone,
             message: formData.message,
+            status: 'new'
           }
         ]);
 
       if (error) throw error;
+
+      // Send confirmation email
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-confirmation-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({
+            to: formData.email,
+            firstName: formData.firstName
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to send confirmation email');
+        }
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+        // Continue with form submission even if email fails
+      }
 
       alert('Thank you for your interest! We will be in touch shortly.');
       onClose();
@@ -80,7 +108,7 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
       });
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('There was an error submitting your request. Please try again.');
+      alert('Error submitting form. Please try again or contact us directly.');
     } finally {
       setLoading(false);
     }

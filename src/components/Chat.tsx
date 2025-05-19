@@ -14,6 +14,7 @@ export function Chat() {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageContainerRef = useRef<HTMLDivElement>(null);
+  const [aiTyping, setAiTyping] = useState(false);
 
   const loadChatMessages = async (sessionId: string) => {
     if (!sessionId) return;
@@ -132,6 +133,7 @@ export function Chat() {
     const trimmedMessage = message.trim();
     setMessage('');
 
+    // Create visitor message
     const newMessage = {
       session_id: sessionId,
       visitor_id: visitorId,
@@ -143,12 +145,63 @@ export function Chat() {
 
     try {
       const sentMessage = await sendChatMessage(newMessage);
-      // Optimistically add the message to the UI
-      // Don't add optimistically since we'll get it from the subscription
+      
+      // Show AI is typing
+      setAiTyping(true);
+      
+      try {
+        // Get AI response
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-ai`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            'x-client-info': 'chat-widget'
+          },
+          body: JSON.stringify({
+            message: trimmedMessage,
+            sessionId,
+            visitorId
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to get AI response');
+        }
+
+        const data = await response.json();
+        if (!data || !data.message) {
+          throw new Error('Invalid response from AI service');
+        }
+
+        // Message will be added via subscription
+      } catch (aiError) {
+        console.error('AI response error:', aiError);
+        
+        // Create fallback message if AI fails
+        const fallbackMessage = {
+          session_id: sessionId,
+          visitor_id: visitorId,
+          content: "I apologize, but I'm experiencing technical difficulties. A team member will assist you shortly.",
+          is_from_visitor: false,
+          user_id: null,
+          read: false
+        };
+        
+        try {
+          await sendChatMessage(fallbackMessage);
+        } catch (fallbackError) {
+          console.error('Error sending fallback message:', fallbackError);
+        }
+      }
+
     } catch (error) {
       console.error('Error sending message:', error);
       alert('Error sending message. Please try again.');
       setMessage(trimmedMessage);
+    } finally {
+      setAiTyping(false);
     }
   };
 
@@ -220,6 +273,17 @@ export function Chat() {
                     </div>
                   </div>
                 ))}
+                {aiTyping && (
+                  <div className="flex justify-start">
+                    <div className="bg-gray-100 text-gray-900 rounded-lg px-4 py-2">
+                      <div className="flex space-x-2">
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
 
