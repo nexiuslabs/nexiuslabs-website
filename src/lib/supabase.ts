@@ -32,8 +32,8 @@ const retryOperation = async (operation: () => Promise<any>, maxRetries = 3) => 
   }
 };
 
-if (!supabaseAnonKey) {
-  throw new Error('Missing Supabase anonymous key');
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing required Supabase configuration');
 }
 
 // Initialize storage with fallback
@@ -70,7 +70,7 @@ const customStorage = {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
-    persistSession: false, // Don't persist session to avoid stale token issues
+    persistSession: false,
     detectSessionInUrl: true,
     storage: customStorage,
     storageKey: 'supabase-auth-token',
@@ -81,7 +81,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       return retryOperation(() => fetch(...args))
         .catch((error) => {
           handleSupabaseError(error);
-          throw error; // Re-throw to maintain error chain
+          throw error;
         });
     }
   }

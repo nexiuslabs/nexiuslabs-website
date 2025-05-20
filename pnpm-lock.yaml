@@ -16,12 +16,12 @@ importers:
         version: 2.4.0
       '@supabase/supabase-js':
         specifier: ^2.39.7
-        version: 2.49.4
+        version: 2.49.5
       '@tailwindcss/typography':
         specifier: ^0.5.10
         version: 0.5.16(tailwindcss@3.4.17)
       '@tiptap/core':
-        specifier: ^2.12.0
+        specifier: 2.12.0
         version: 2.12.0(@tiptap/pm@2.12.0)
       '@tiptap/extension-color':
         specifier: ^2.2.4
@@ -91,7 +91,7 @@ importers:
         version: 6.12.0
       openai:
         specifier: ^4.28.0
-        version: 4.100.0(ws@8.18.2)(zod@3.25.1)
+        version: 4.100.0(ws@8.18.2)(zod@3.25.7)
       pdf-parse:
         specifier: ^1.1.1
         version: 1.1.1
@@ -657,8 +657,8 @@ packages:
   '@supabase/storage-js@2.7.1':
     resolution: {integrity: sha512-asYHcyDR1fKqrMpytAS1zjyEfvxuOIp1CIXX7ji4lHHcJKqyk+sLl/Vxgm4sN6u8zvuUtae9e4kDxQP2qrwWBA==}
 
-  '@supabase/supabase-js@2.49.4':
-    resolution: {integrity: sha512-jUF0uRUmS8BKt37t01qaZ88H9yV1mbGYnqLeuFWLcdV+x1P4fl0yP9DGtaEhFPZcwSom7u16GkLEH9QJZOqOkw==}
+  '@supabase/supabase-js@2.49.5':
+    resolution: {integrity: sha512-LfsQLK1WVDzkYQvS3rmaLDPpZdN75GPYxPJd7uJOS8jrV2Kchk5qzvhvmofRPb6esQhw+YYfAYDInURtPUupLQ==}
 
   '@tailwindcss/typography@0.5.16':
     resolution: {integrity: sha512-0wDLwCVF5V3x3b1SGXPCDcdsbDHMBe+lkFzBRaHeLvNi+nrrnZ1lA18u+OTWO8iSWU2GxUOCvlXtDuqftc1oiA==}
@@ -2306,8 +2306,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@3.25.1:
-    resolution: {integrity: sha512-bkxUGQiqWDTXHSgqtevYDri5ee2GPC9szPct4pqpzLEpswgDQmuseDz81ZF0AnNu1xsmnBVmbtv/t/WeUIHlpg==}
+  zod@3.25.7:
+    resolution: {integrity: sha512-YGdT1cVRmKkOg6Sq7vY7IkxdphySKnXhaUmFI4r4FcuFVNgpCb9tZfNwXbT6BPjD5oz0nubFsoo9pIqKrDcCvg==}
 
 snapshots:
 
@@ -2584,7 +2584,7 @@ snapshots:
     dependencies:
       '@llamaindex/env': 0.1.10(js-tiktoken@1.0.20)(tiktoken@1.0.21)
       '@types/node': 22.15.19
-      zod: 3.25.1
+      zod: 3.25.7
     transitivePeerDependencies:
       - '@aws-crypto/sha256-js'
       - js-tiktoken
@@ -2741,7 +2741,7 @@ snapshots:
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
-  '@supabase/supabase-js@2.49.4':
+  '@supabase/supabase-js@2.49.5':
     dependencies:
       '@supabase/auth-js': 2.69.1
       '@supabase/functions-js': 2.4.4
@@ -3862,7 +3862,7 @@ snapshots:
 
   object-hash@3.0.0: {}
 
-  openai@4.100.0(ws@8.18.2)(zod@3.25.1):
+  openai@4.100.0(ws@8.18.2)(zod@3.25.7):
     dependencies:
       '@types/node': 18.19.101
       '@types/node-fetch': 2.6.12
@@ -3873,7 +3873,7 @@ snapshots:
       node-fetch: 2.7.0
     optionalDependencies:
       ws: 8.18.2
-      zod: 3.25.1
+      zod: 3.25.7
     transitivePeerDependencies:
       - encoding
 
@@ -4447,4 +4447,4 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod@3.25.1: {}
+  zod@3.25.7: {}
