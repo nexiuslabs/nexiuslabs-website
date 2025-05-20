@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { type AuthError } from '@supabase/supabase-js';
 
 // Ensure we have the required environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://tunidbyclygzipvbfzee.supabase.co';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Improved error handling
